@@ -1,0 +1,66 @@
+derivacao da posicao, velocidade e aceleracao
+--------------------------------
+variaveis e valores
+--------------------------------
+f0 = 19  f1 = 58  fps = 30.000000
+t0 = 0.633333  t1 = 1.933333  T = 1.300000
+x0 = 0.000000  y0 = 7.000000  z0 = 2.000000
+x1 = 6.000000  y1 = 6.000000  z1 = 0.000000
+g  = 9.810000
+
+formulas simbolicas
+--------------------------------
+para t em [t0, t1]:
+x(t) = x0 + (x1 - x0) * (t - t0) / T
+y(t) = y0 + (y1 - y0) * (t - t0) / T
+z(t) = z0 + (z1 - z0) * (t - t0) / T + 0.5 * g * T * (t - t0) - 0.5 * g * (t - t0)^2
+equivalente no trecho: z(t) = a * t^2 + b * t + c
+fora do voo: t <= t0 usa (x0, y0, z0) e t >= t1 usa (x1, y1, z1)
+
+expansoes e coeficientes calculados
+--------------------------------
+x(t):
+  x(t) = x0 + (x1 - x0)/T * (t - t0)
+       = [(x1 - x0)/T] * t + [x0 - (x1 - x0)/T * t0]
+  onde m_x = (x1 - x0)/T = 4.615385  e  q_x = x0 - m_x * t0 = -2.923077
+  portanto, x(t) = 4.615385 * t + -2.923077
+
+y(t):
+  y(t) = y0 + (y1 - y0)/T * (t - t0)
+       = [(y1 - y0)/T] * t + [y0 - (y1 - y0)/T * t0]
+  onde m_y = (y1 - y0)/T = -0.769231  e  q_y = y0 - m_y * t0 = 7.487179
+  portanto, y(t) = -0.769231 * t + 7.487179
+
+z(t):
+  partimos de z = z0 + (z1 - z0)/T * (t - t0) + 0.5*g*T*(t - t0) - 0.5*g*(t - t0)^2
+  expandindo (t - t0)^2 = t^2 - 2*t0*t + t0^2
+  agrupando em z(t) = a*t^2 + b*t + c, obtemos:
+    a = -0.5*g
+    b = (z1 - z0)/T + 0.5*g*T + g*t0
+    c = z0 - [(z1 - z0)/T + 0.5*g*T]*t0 - 0.5*g*t0^2
+  valores: a = -4.905000  b = 11.051038  c = -3.031541
+  portanto, z(t) = -4.905000 * t^2 + 11.051038 * t + -3.031541
+
+derivacao por calculo diferencial - velocidade e aceleracao
+--------------------------------
+no trecho t em [t0, t1]:
+  vx(t) = dx/dt = m_x = 4.615385
+  vy(t) = dy/dt = m_y = -0.769231
+  vz(t) = dz/dt = 2*a*t + b = -9.810000*t + 11.051038
+fora do trecho, as funções foram clampadas, então v(t) = 0
+
+modulo da velocidade:
+  |v(t)| = sqrt( vx(t)^2 + vy(t)^2 + vz(t)^2 )
+         = sqrt( 4.615385^2 + -0.769231^2 + ( -9.810000*t + 11.051038 )^2 )
+
+aceleracao:
+  ax(t) = 0
+  ay(t) = 0
+  az(t) = d/dt[vz(t)] = 2*a = -9.810000  que equivale a -g
+
+checagem por integral
+--------------------------------
+  integrando vz(t) = 2*a*t + b:  ∫vz dt = a*t^2 + b*t + C
+  impondo z(t0) = z0, obtemos C = c, logo z(t) = a*t^2 + b*t + c
+  idem para x e y:  ∫vx dt = m_x*t + Cx, com Cx = q_x  -  ok
+
